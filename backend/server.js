@@ -5,12 +5,15 @@ const app = express();
 const PORT = 3000;
 
 // initialize dotenv
-require('dotenv').config();
+require("dotenv").config();
 
 app.use(express.json());
 
 // function to connect to MongoDB
 const uri = process.env.MONGO_URI;
+const clientOptions = {
+  serverApi: { version: "1", strict: true, deprecationErrors: true },
+};
 async function connectDb() {
   try {
     await mongoose.connect(uri, clientOptions);
