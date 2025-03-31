@@ -1,35 +1,33 @@
-// import mongoose
-const mongoose = require("mongoose");
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+const postRouter = require('./routes/posts');
+const userRouter = require('./routes/users');
+const commentRouter = require('./routes/comments');
+const authRoutes = require('./routes/auth');  // Import auth routes
+
+dotenv.config();
+
 const app = express();
-const PORT = 3000;
-const userRouter = require("./routes/UserRoutes");
-
-// initialize dotenv
-require("dotenv").config();
-
+app.use(cors());
 app.use(express.json());
-app.use("/api/v1", userRouter);
 
-// function to connect to MongoDB
-const uri = process.env.MONGO_URI;
-const clientOptions = {
-  serverApi: { version: "1", strict: true, deprecationErrors: true },
-};
-async function connectDb() {
-  try {
-    await mongoose.connect(uri, clientOptions);
-    await mongoose.connection.db.admin().command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } catch (error) {
-    console.log("Error: " + error);
-    await mongoose.disconnect();
-  }
-}
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.log(err));  
+  
+  
+app.use('/api/auth', authRoutes);  // Authentication routes
+app.use('/api/posts', postRouter);
+app.use('/api/users', userRouter);
+app.use('/api/comments', commentRouter);
 
-app.listen(PORT, async () => {
-  await connectDb().catch(console.dir);
-  console.log(`Express API started: http://localhost:${PORT}`);
-});
+app.listen(5000, () => console.log("Server running on port 5000"));
+
+
+
+
+
+
